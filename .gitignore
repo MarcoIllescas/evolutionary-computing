@@ -1,0 +1,13 @@
+# Ignore CLion build directories
+cmake-build-*/
+
+# Ignore object files and executables
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# Ignore logs and temporary files
+*.log
+*.tmp
