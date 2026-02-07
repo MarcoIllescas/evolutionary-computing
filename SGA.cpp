@@ -9,17 +9,20 @@
 using namespace std;
 
 //********** Genetic Algorithm Configuration Parameters **********//
-const int NumGen = 5;
-const int NumBitsXGen[NumGen] = {4, 2, 4, 8, 4};
-const int PopulationSize = 3;
+const int NumGen = 3;
+const int NumBitsXGen[NumGen] = {2, 4, 8};
+const int PopulationSize = 5;
+const float LowerLimit[NumGen] = {0, 0, 0};
+const float UpperLimit[NumGen] = {1, 1, 1};
 
 typedef unsigned char BYTE;
 
 typedef struct
 {
     BYTE *Chromosome;
-    unsigned int *IntValues;
+    unsigned int *IntValue;
     float Fitness;
+    float *RealValue;
 } Individual;
 
 int main() {
@@ -41,12 +44,19 @@ int main() {
     for(int k = 0; k < PopulationSize; k++) {
         // Allocate memory for each Chromosome
         Population[k].Chromosome = new BYTE[ChromosomeSize];
-        Population[k].IntValues = new unsigned int[NumGen];
+        Population[k].IntValue = new unsigned int[NumGen];
+        Population[k].RealValue = new float[NumGen];
 
         // Initialize chromosome
         for(int i = 0; i < ChromosomeSize; i++) {
             Population[k].Chromosome[i] = rand() % 2;
         }
+
+        for (int j = 0; j < NumGen; j++) {
+            Population[k].IntValue[j] = 0;
+            Population[k].RealValue[j] = 0.0;
+        }
+
         Population[k].Fitness = 0.0;
     }
 
@@ -64,41 +74,63 @@ int main() {
                 Value |= (bit << b);
             }
 
-            Population[k].IntValues[g] = Value;
+            Population[k].IntValue[g] = Value;
             Position += NumBitsXGen[g];
+        }
+    }
+
+    // Decodification to real values
+    for(int k = 0; k < PopulationSize; k++) {
+        float range;
+        float Denominator;
+
+        for (int g = 0; g < NumGen; g++) {
+            range = UpperLimit[g] - LowerLimit[g];
+            Denominator = pow(2, NumBitsXGen[g]) - 1;
+            Population[k].RealValue[g] = ((Population[k].IntValue[g]/Denominator) * range) + LowerLimit[g];
         }
     }
 
     // Print population of individuals
     for(int k = 0; k < PopulationSize; k++) {
-        cout << "INDIVIUAL [" << k << "]: { ";
+        cout << "INDIVIUAL [" << k << "]:" << endl;
 
+        // 1. Print Gen (Binary)
+        cout << "   CHROMOSOME: { ";
         int GlobalPosition = 0;
-
-        for(int g = 0; g < NumGen; g++) {
-            for(int b = NumBitsXGen[g] - 1; b >= 0; b--) {
+        for (int g = 0; g < NumGen; g++) {
+            for (int b = NumBitsXGen[g] - 1; b >= 0; b--) {
                 cout << (int)Population[k].Chromosome[GlobalPosition + b];
             }
-
             if (g < NumGen - 1) { cout << " : "; }
-
             GlobalPosition += NumBitsXGen[g];
         }
         cout << " }" << endl;
 
-        cout << "DECODIFICATION [" << k << "]: { ";
+        // 2. Print Fenotype (Integer Value)
+        cout << "   DECODIFICATION TO INT: { ";
         for (int g = 0; g < NumGen; g++) {
-            cout << "GEN[" << g << "]: " << Population[k].IntValues[g];
-            if (g < NumGen - 1) { cout << " --- "; }
+            cout << Population[k].IntValue[g];
+            if (g < NumGen - 1) { cout << " | "; }
         }
         cout << " }" << endl;
+
+        // 3. Print Fenotype (Float Value)
+        cout << "   REAL VALUE: { ";
+        for (int g = 0; g < NumGen; g++) {
+            cout << Population[k].RealValue[g];
+            if (g < NumGen - 1) { cout << " | "; }
+        }
+        cout << " }" << endl;
+
         cout << "--------------------------------------------------------" << endl;
     }
 
     // Free allocated memory
     for (int k = 0; k < PopulationSize; k++) {
         delete[] Population[k].Chromosome;
-        delete[] Population[k].IntValues;
+        delete[] Population[k].IntValue;
+        delete[] Population[k].RealValue;
     }
 
     return 0;
