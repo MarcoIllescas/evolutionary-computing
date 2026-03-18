@@ -2,7 +2,6 @@
     MAIN PROGRAM
     Usage of the Simple Genetic Algorithm
 */
-
 #include <iostream>
 #include <ctime>
 #include "SGA.hpp"

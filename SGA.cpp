@@ -85,6 +85,26 @@ void GeneticAlgorithm::decodeToReal() {
     }
 }
 
+// ===================== DECODE INTEGER ===================== //
+void GeneticAlgorithm::decodeToInteger() {
+    for (unsigned int i = 0; i < populationSize; i++) {
+
+        unsigned int indexBit = 0;
+
+        for (unsigned int g = 0; g < numberOfGenes; g++) {
+
+            unsigned int value = 0;
+
+            for (unsigned int b = 0; b < bitsPerGene[g]; b++) {
+                value = (value << 1) | population[i].chromosome[indexBit];
+                indexBit++;
+            }
+
+            population[i].intValues[g] = value;
+        }
+    }
+}
+
 // ===================== PRINT INDIVIDUAL ===================== //
 void GeneticAlgorithm::printIndividual(unsigned int index) {
     unsigned int accumulated = chromosomeSize - 1;
