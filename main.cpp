@@ -13,7 +13,7 @@ const unsigned int NUMBER_OF_GENES = 1;
 const unsigned int BITS_PER_GENE[NUMBER_OF_GENES] = {8};
 
 const unsigned int POPULATION_SIZE = 10;
-const unsigned int MAX_GENERATIONS = 3;
+const unsigned int MAX_GENERATIONS = 100;
 
 const float UPPER_LIMITS[NUMBER_OF_GENES] = {255};
 const float LOWER_LIMITS[NUMBER_OF_GENES] = {0};
@@ -45,8 +45,8 @@ int main() {
     for (unsigned int generation = 1; generation <= MAX_GENERATIONS; generation++) {
 
         ga.selectionRoulette();
-        ga.crossoverOnePoint(1.0);   // 100% crossover
-        ga.mutation(0.01);           // 1% mutation
+        ga.crossoverOnePoint(0.88);
+        ga.mutation(0.05);
 
         ga.applyElitism();
 

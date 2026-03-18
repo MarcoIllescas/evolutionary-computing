@@ -174,32 +174,37 @@ void GeneticAlgorithm::computeFitness(OptimizationType type) {
     sumFitness = 0.0f;
 
     if (type == MAXIMIZE) {
-        float range = population[bestIndex].objectiveValue - population[worstIndex].objectiveValue;
+        float maxObj = population[bestIndex].objectiveValue;
+        float minObj = population[worstIndex].objectiveValue;
+        float range = maxObj - minObj;
 
-        for (unsigned int i = 0; i < populationSize; i++) {
-            population[i].fitnessValue =
-                100 * ((population[i].objectiveValue - population[worstIndex].objectiveValue) / range);
+        if (range == 0.0f) {
+            for (unsigned int i = 0; i < populationSize; i++) {
+                population[i].fitnessValue = 1.0f;
+                sumFitness += population[i].fitnessValue;
+            }
+        } else {
+            for (unsigned int i = 0; i < populationSize; i++) {
+                population[i].fitnessValue = population[bestIndex].objectiveValue - population[i].objectiveValue;
+            }
 
-            sumFitness += population[i].fitnessValue;
-        }
-    } else {
-        for (unsigned int i = 0; i < populationSize; i++) {
-            population[i].fitnessValue =
-                population[bestIndex].objectiveValue - population[i].objectiveValue;
-        }
+            float minFit = population[worstIndex].fitnessValue;
+            float maxFit = population[bestIndex].fitnessValue;
+            float range = maxFit - minFit;
 
-        float minFit = population[worstIndex].fitnessValue;
-        float range = population[bestIndex].fitnessValue - minFit;
-
-        for (unsigned int i = 0; i < populationSize; i++) {
-            population[i].fitnessValue =
-                100 * ((population[i].fitnessValue - minFit) / range);
-
-            sumFitness += population[i].fitnessValue;
+            if (range == 0.0f) {
+                for (unsigned int i = 0; i < populationSize; i++) {
+                    population[i].fitnessValue = 1.0f;
+                    sumFitness += population[i].fitnessValue;
+                }
+            } else {
+                for (unsigned int i = 0; i < populationSize; i++) {
+                    population[i].fitnessValue = 100.0f * ((population[i].fitnessValue - minFit) / range);
+                    sumFitness += population[i].fitnessValue;
+                }
+            }
         }
     }
-
-    avgFitness = sumFitness / populationSize;
 }
 
 // ===================== ROULETTE ===================== //
