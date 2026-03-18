@@ -1,5 +1,5 @@
 /*
-MAIN PROGRAM
+    MAIN PROGRAM
     Usage of the Simple Genetic Algorithm
 */
 

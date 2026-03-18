@@ -1,5 +1,6 @@
 /*
-    Simple Genetic Algorithm
+    SIMPLE GENETIC ALGORITHM
+    SGA.hpp
 */
 
 #include <iostream>
@@ -58,6 +59,9 @@ private:
     float avgFitness;
 
 public:
+    // Destructor
+    ~GeneticAlgorithm();
+
     // Constructor
     GeneticAlgorithm(
         unsigned int populationSize,

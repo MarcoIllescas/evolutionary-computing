@@ -1,5 +1,6 @@
 /*
-    Simple Genetic Algorithm
+    SIMPLE GENETIC ALGORITHM
+    SGA.cpp
 */
 #include "SGA.hpp"
 
@@ -10,7 +11,20 @@ GeneticAlgorithm::GeneticAlgorithm(
     const unsigned int* bitsPerGene,
     const float* upperLimits,
     const float* lowerLimits
-) {
+)
+    : populationSize(populationSize),
+      numberOfGenes(numberOfGenes),
+      bitsPerGene(bitsPerGene),
+      upperLimits(upperLimits),
+      lowerLimits(lowerLimits),
+      chromosomeSize(0),
+      bestIndex(0),
+      worstIndex(0),
+      sumObjective(0.0f),
+      avgObjective(0.0f),
+      sumFitness(0.0f),
+      avgFitness(0.0f)
+{
     this->populationSize = populationSize;
     this->numberOfGenes = numberOfGenes;
     this->bitsPerGene = bitsPerGene;
@@ -20,7 +34,8 @@ GeneticAlgorithm::GeneticAlgorithm(
     chromosomeSize = 0;
 
     // Compute chromosome size
-    for (unsigned int i = 0; i < numberOfGenes; i++) {
+    for (unsigned int i = 0; i < numberOfGenes; i++)
+    {
         chromosomeSize += bitsPerGene[i];
     }
 
@@ -30,7 +45,8 @@ GeneticAlgorithm::GeneticAlgorithm(
     selectionIndices = new unsigned int[populationSize];
 
     // Initialize individuals
-    for (unsigned int i = 0; i < populationSize; i++) {
+    for (unsigned int i = 0; i < populationSize; i++)
+    {
         population[i].chromosome = new BYTE[chromosomeSize];
         population[i].intValues = new unsigned int[numberOfGenes];
         population[i].realValues = new float[numberOfGenes];
@@ -40,12 +56,14 @@ GeneticAlgorithm::GeneticAlgorithm(
         newPopulation[i].realValues = new float[numberOfGenes];
 
         // Random initialization
-        for (unsigned int j = 0; j < chromosomeSize; j++) {
+        for (unsigned int j = 0; j < chromosomeSize; j++)
+        {
             population[i].chromosome[j] = rand() % 2;
         }
 
         // Initialize values
-        for (unsigned int g = 0; g < numberOfGenes; g++) {
+        for (unsigned int g = 0; g < numberOfGenes; g++)
+        {
             population[i].intValues[g] = 0;
             population[i].realValues[g] = 0.0f;
         }
@@ -238,4 +256,43 @@ void GeneticAlgorithm::nextGeneration() {
     Individual* temp = population;
     population = newPopulation;
     newPopulation = temp;
+}
+
+// ===================== DESTRUCTOR ===================== //
+GeneticAlgorithm::~GeneticAlgorithm() {
+    // Free individuals in population
+    for (unsigned int i = 0; i < populationSize; i++) {
+        delete[] population[i].chromosome;
+        delete[] population[i].intValues;
+        delete[] population[i].realValues;
+
+        delete[] newPopulation[i].chromosome;
+        delete[] newPopulation[i].intValues;
+        delete[] newPopulation[i].realValues;
+    }
+
+    // Free arrays
+    delete[] population;
+    delete[] newPopulation;
+    delete[] selectionIndices;
+}
+
+float GeneticAlgorithm::objectiveFunction(unsigned int index) {
+    float x = population[index].intValues[0];
+
+    // Example 1: Maximization parabola
+    return 250 - pow(x - 155, 2);
+
+    // ===== Other test cases ===== //
+
+    // Root finding:
+    // return (x * x) - (23 * x) - 50;
+
+    // Minimization:
+    // return pow(x - 115, 2);
+
+    // Multi-variable:
+    // float x0 = population[index].realValues[0];
+    // float x1 = population[index].realValues[1];
+    // return 250 - pow(x0 - 64, 2) - pow(x1 - 128, 2);
 }
