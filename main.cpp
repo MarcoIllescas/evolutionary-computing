@@ -46,7 +46,7 @@ int main() {
 
         ga.selectionRoulette();
         ga.crossoverOnePoint(0.88);
-        ga.mutation(0.05);
+        ga.mutation(0.03);
 
         ga.applyElitism();
 

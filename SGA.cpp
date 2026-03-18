@@ -205,6 +205,15 @@ void GeneticAlgorithm::computeFitness(OptimizationType type) {
             }
         }
     }
+
+    if (sumFitness == 0.0f) {
+        for (unsigned int i = 0; i < populationSize; i++) {
+            population[i].fitnessValue = 1.0f;
+        }
+        sumFitness = populationSize;
+    }
+
+    avgFitness = sumFitness / populationSize;
 }
 
 // ===================== ROULETTE ===================== //
@@ -217,11 +226,13 @@ void GeneticAlgorithm::selectionRoulette() {
         cumulativeProb[i] = sum;
     }
 
+    cumulativeProb[populationSize - 1] = 1.0f;
+
     for (unsigned int i = 0; i < populationSize; i++) {
         float r = (float)rand() / RAND_MAX;
         unsigned int sel = 0;
 
-        while (cumulativeProb[sel] < r) {
+        while (sel < populationSize - 1 && cumulativeProb[sel] < r) {
             sel++;
         }
 
