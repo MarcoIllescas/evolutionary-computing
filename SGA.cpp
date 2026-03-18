@@ -96,7 +96,7 @@ void GeneticAlgorithm::decodeToInteger() {
             unsigned int value = 0;
 
             for (unsigned int b = 0; b < bitsPerGene[g]; b++) {
-                value = (value << 1) | population[i].chromosome[indexBit];
+                value += population[i].chromosome[indexBit] << b;
                 indexBit++;
             }
 
@@ -110,11 +110,11 @@ void GeneticAlgorithm::printIndividual(unsigned int index) {
     unsigned int accumulated = chromosomeSize - 1;
     int g = numberOfGenes - 1;
 
-    cout << "[" << index << "] ";
+    cout << "[" << index << "]";
 
     for (int i = chromosomeSize - 1; i >= 0; i--) {
         if (i == (int)accumulated) {
-            cout << ":";
+            cout << ": ";
             accumulated -= bitsPerGene[g];
             g--;
         }

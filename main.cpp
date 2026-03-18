@@ -34,7 +34,7 @@ int main() {
 
     // ===== INITIAL EVALUATION ===== //
     ga.decodeToInteger();
-    // ga.decodeToReal(); // optional depending on problem
+    ga.decodeToReal();
     ga.evaluatePopulation();
     ga.computeFitness(MAXIMIZE);
 
@@ -54,7 +54,7 @@ int main() {
 
         // Re-evaluate
         ga.decodeToInteger();
-        // ga.decodeToReal();
+        ga.decodeToReal();
         ga.evaluatePopulation();
         ga.computeFitness(MAXIMIZE);
 
