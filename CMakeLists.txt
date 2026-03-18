@@ -3,4 +3,4 @@ project(EjerciciosEnClase)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(EjerciciosEnClase SGA.cpp)
+add_executable(EjerciciosEnClase main.cpp SGA.hpp SGA.cpp)
