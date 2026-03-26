@@ -3,7 +3,6 @@
     Usage of the Simple Genetic Algorithm
 */
 #include <iostream>
-#include <ctime>
 #include "SGA.hpp"
 #include "Problems.hpp"
 
@@ -21,8 +20,6 @@ const float LOWER_LIMITS[NUMBER_OF_GENES] = {0};
 
 // ===================== MAIN ===================== //
 int main() {
-    srand((unsigned)time(nullptr));
-
     cout << "Starting Genetic Algorithm..." << endl;
 
     MaximizeParabola currentProblem;

@@ -25,7 +25,8 @@ GeneticAlgorithm::GeneticAlgorithm(
       sumObjective(0.0f),
       avgObjective(0.0f),
       sumFitness(0.0f),
-      avgFitness(0.0f)
+      avgFitness(0.0f),
+      randomGenerator(std::random_device{}())
 {
     this->populationSize = populationSize;
     this->numberOfGenes = numberOfGenes;
@@ -46,6 +47,9 @@ GeneticAlgorithm::GeneticAlgorithm(
     newPopulation = new Individual[populationSize];
     selectionIndices = new unsigned int[populationSize];
 
+    // Randomness bit distribution
+    std::uniform_int_distribution<int> distBit(0, 1);
+
     // Initialize individuals
     for (unsigned int i = 0; i < populationSize; i++)
     {
@@ -60,7 +64,7 @@ GeneticAlgorithm::GeneticAlgorithm(
         // Random initialization
         for (unsigned int j = 0; j < chromosomeSize; j++)
         {
-            population[i].chromosome[j] = rand() % 2;
+            population[i].chromosome[j] = distBit(randomGenerator);
         }
 
         // Initialize values
@@ -234,8 +238,11 @@ void GeneticAlgorithm::selectionRoulette() {
 
     cumulativeProb[populationSize - 1] = 1.0f;
 
+    // Random initialization
+    std::uniform_real_distribution<float> distProb(0.0f, 1.0f);
+
     for (unsigned int i = 0; i < populationSize; i++) {
-        float r = (float)rand() / RAND_MAX;
+        float r = distProb(randomGenerator);
         unsigned int sel = 0;
 
         while (sel < populationSize - 1 && cumulativeProb[sel] < r) {
@@ -250,13 +257,18 @@ void GeneticAlgorithm::selectionRoulette() {
 void GeneticAlgorithm::crossoverOnePoint(double probCrossover) {
     unsigned int limit = chromosomeSize - 1;
 
+    // Distribution for the crossover probability
+    std::uniform_real_distribution<double> distProb(0.0, 1.0);
+    // Distribution to choose the uniform cutoff point [0, limit - 1]
+    std::uniform_int_distribution<unsigned int> distPoint(0, limit > 0 ? limit - 1 : 0);
+
     for (unsigned int i = 0; i < populationSize; i += 2) {
-        double r = (double)rand() / RAND_MAX;
+        double r = distProb(randomGenerator);
 
         unsigned int parent1 = selectionIndices[i];
         unsigned int parent2 = selectionIndices[i + 1];
 
-        unsigned int crossoverPoint = rand() % limit;
+        unsigned int crossoverPoint = distPoint(randomGenerator);
 
         for (unsigned int j = 0; j < chromosomeSize; j++) {
             if (r < probCrossover && j > crossoverPoint) {
@@ -272,13 +284,15 @@ void GeneticAlgorithm::crossoverOnePoint(double probCrossover) {
 
 // ===================== MUTATION ===================== //
 void GeneticAlgorithm::mutation(double probMutation) {
+    // Random initialization
+    std::uniform_real_distribution<double> distProb(0.0, 1.0);
+
     for (unsigned int i = 0; i < populationSize; i++) {
         for (unsigned int j = 0; j < chromosomeSize; j++) {
-            double r = (double)rand() / RAND_MAX;
+            double r = distProb(randomGenerator);
 
             if (r < probMutation) {
-                newPopulation[i].chromosome[j] =
-                    1 - newPopulation[i].chromosome[j];
+                newPopulation[i].chromosome[j] = 1 - newPopulation[i].chromosome[j];
             }
         }
     }

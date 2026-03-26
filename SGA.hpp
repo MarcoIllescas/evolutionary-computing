@@ -4,8 +4,10 @@
 */
 
 #include <iostream>
-#include "IOptimizationProblem.hpp"
 #include <cmath>
+#include <random>
+
+#include "IOptimizationProblem.hpp"
 
 using namespace std;
 
@@ -34,6 +36,8 @@ struct Individual {
 // ===================== GENETIC ALGORITHM CLASS ===================== //
 class GeneticAlgorithm {
 private:
+    std::mt19937 randomGenerator;
+
     // Population
     Individual* population;
     Individual* newPopulation;
