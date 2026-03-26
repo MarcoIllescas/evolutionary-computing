@@ -83,7 +83,7 @@ int main() {
 
     // ===== CONNECT PLOTTER ===== //
     cout << "Generating graph with Python" << endl;
-    std::system("/home/illescas/venvs/ComputoEvolutivo/bin/python plotter.py");
+    std::system("python3 plotter.py");
 
     cout << "\nEnd of program." << endl;
     return 0;
