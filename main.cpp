@@ -15,6 +15,8 @@ const unsigned int BITS_PER_GENE[NUMBER_OF_GENES] = {8};
 const unsigned int POPULATION_SIZE = 10;
 const unsigned int MAX_GENERATIONS = 100;
 
+const unsigned int PRINT_FREQUENCY = 10;
+
 const float UPPER_LIMITS[NUMBER_OF_GENES] = {255};
 const float LOWER_LIMITS[NUMBER_OF_GENES] = {0};
 
@@ -59,8 +61,10 @@ int main() {
         ga.evaluatePopulation();
         ga.computeFitness(MAXIMIZE);
 
-        cout << "\nGeneration " << generation << ":" << endl;
-        ga.printPopulation();
+        if (generation == 1 || generation % PRINT_FREQUENCY == 0 || generation == MAX_GENERATIONS) {
+            cout << "\nGeneration " << generation << ":" << endl;
+            ga.printPopulation();
+        }
     }
 
     cout << "\nEnd of program." << endl;

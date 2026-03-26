@@ -139,7 +139,7 @@ void GeneticAlgorithm::printIndividual(unsigned int index) {
 
     cout << "| Obj: " << population[index].objectiveValue;
     cout << " Fit: " << population[index].fitnessValue;
-    cout << endl;
+    cout << "\n";
 }
 
 // ===================== PRINT POPULATION ===================== //
@@ -148,10 +148,10 @@ void GeneticAlgorithm::printPopulation() {
         printIndividual(i);
     }
 
-    cout << "Best ID: " << bestIndex << endl;
-    cout << "Worst ID: " << worstIndex << endl;
-    cout << "Avg Obj: " << avgObjective << endl;
-    cout << "Avg Fit: " << avgFitness << endl;
+    cout << "Best ID: " << bestIndex << "\n";
+    cout << "Worst ID: " << worstIndex << "\n";
+    cout << "Avg Obj: " << avgObjective << "\n";
+    cout << "Avg Fit: " << avgFitness << std::endl;
 }
 
 // ===================== EVALUATION ===================== //
