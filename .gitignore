@@ -14,3 +14,7 @@ cmake-build-*/
 # Ignore logs and temporary files
 *.log
 *.tmp
+
+# Ignore CSV and PNG
+*.csv
+*.png

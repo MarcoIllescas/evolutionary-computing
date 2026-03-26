@@ -49,7 +49,7 @@ int main() {
 
     // ===== OPEN CSV FILE AND WRITE HEADERS ===== //
     std::ofstream csvFile("ga_results.csv");
-    csvFile << "Generation, Best, Average, Worst\n";
+    csvFile << "Generation,Best,Average,Worst\n";
 
     // ===== EVOLUTION LOOP ===== //
     for (unsigned int generation = 1; generation <= MAX_GENERATIONS; generation++) {
@@ -80,6 +80,10 @@ int main() {
     // ===== CLOSE CSV FILE ===== //
     csvFile.close();
     cout << "\nData saved in ga_results.csv" << endl;
+
+    // ===== CONNECT PLOTTER ===== //
+    cout << "Generating graph with Python" << endl;
+    std::system("/home/illescas/venvs/ComputoEvolutivo/bin/python plotter.py");
 
     cout << "\nEnd of program." << endl;
     return 0;
