@@ -4,6 +4,7 @@
 */
 
 #include <iostream>
+#include "IOptimizationProblem.hpp"
 #include <cmath>
 
 using namespace std;
@@ -58,6 +59,8 @@ private:
     float sumFitness;
     float avgFitness;
 
+    const IOptimizationProblem* problem;
+
 public:
     // Destructor
     ~GeneticAlgorithm();
@@ -68,7 +71,8 @@ public:
         unsigned int numberOfGenes,
         const unsigned int* bitsPerGene,
         const float* upperLimits,
-        const float* lowerLimits
+        const float* lowerLimits,
+        const IOptimizationProblem* problem
     );
 
     // Decoding
@@ -76,7 +80,6 @@ public:
     void decodeToReal();
 
     // Evaluation
-    virtual float objectiveFunction(unsigned int index);
     void evaluatePopulation();
     void computeFitness(OptimizationType type);
 

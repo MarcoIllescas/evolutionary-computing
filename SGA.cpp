@@ -10,13 +10,15 @@ GeneticAlgorithm::GeneticAlgorithm(
     unsigned int numberOfGenes,
     const unsigned int* bitsPerGene,
     const float* upperLimits,
-    const float* lowerLimits
+    const float* lowerLimits,
+    const IOptimizationProblem* problem
 )
     : populationSize(populationSize),
       numberOfGenes(numberOfGenes),
       bitsPerGene(bitsPerGene),
       upperLimits(upperLimits),
       lowerLimits(lowerLimits),
+      problem(problem),
       chromosomeSize(0),
       bestIndex(0),
       worstIndex(0),
@@ -78,7 +80,7 @@ void GeneticAlgorithm::decodeToReal() {
     for (unsigned int i = 0; i < populationSize; i++) {
         for (unsigned int g = 0; g < numberOfGenes; g++) {
             float range = upperLimits[g] - lowerLimits[g];
-            float denominator = pow(2, bitsPerGene[g]) - 1;
+            float denominator = std::pow(2, bitsPerGene[g]) - 1;
 
             population[i].realValues[g] = ((population[i].intValues[g] / denominator) * range) + lowerLimits[g];
         }
@@ -155,7 +157,11 @@ void GeneticAlgorithm::evaluatePopulation() {
     sumObjective = 0.0f;
 
     for (unsigned int i = 0; i < populationSize; i++) {
-        population[i].objectiveValue = objectiveFunction(i);
+        population[i].objectiveValue = problem->evaluate(
+            population[i].intValues,
+            population[i].realValues,
+            numberOfGenes
+        );
 
         if (population[i].objectiveValue > population[bestIndex].objectiveValue)
             bestIndex = i;
@@ -313,22 +319,3 @@ GeneticAlgorithm::~GeneticAlgorithm() {
     delete[] selectionIndices;
 }
 
-float GeneticAlgorithm::objectiveFunction(unsigned int index) {
-    float x = population[index].intValues[0];
-
-    // Example 1: Maximization parabola
-    return 250 - pow(x - 155, 2);
-
-    // ===== Other test cases ===== //
-
-    // Root finding:
-    // return (x * x) - (23 * x) - 50;
-
-    // Minimization:
-    // return pow(x - 115, 2);
-
-    // Multi-variable:
-    // float x0 = population[index].realValues[0];
-    // float x1 = population[index].realValues[1];
-    // return 250 - pow(x0 - 64, 2) - pow(x1 - 128, 2);
-}

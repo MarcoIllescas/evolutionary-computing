@@ -5,6 +5,7 @@
 #include <iostream>
 #include <ctime>
 #include "SGA.hpp"
+#include "Problems.hpp"
 
 using namespace std;
 
@@ -24,12 +25,15 @@ int main() {
 
     cout << "Starting Genetic Algorithm..." << endl;
 
+    MaximizeParabola currentProblem;
+
     GeneticAlgorithm ga(
         POPULATION_SIZE,
         NUMBER_OF_GENES,
         BITS_PER_GENE,
         UPPER_LIMITS,
-        LOWER_LIMITS
+        LOWER_LIMITS,
+        &currentProblem
     );
 
     // ===== INITIAL EVALUATION ===== //
