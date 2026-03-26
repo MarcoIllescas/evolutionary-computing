@@ -103,4 +103,9 @@ public:
     // Debug / Output
     void printIndividual(unsigned int index);
     void printPopulation();
+
+    // Getters
+    float getBestObjective() const { return population[bestIndex].objectiveValue; }
+    float getWorstObjective() const { return population[worstIndex].objectiveValue; }
+    float getAvgObjective() const { return avgObjective; }
 };
