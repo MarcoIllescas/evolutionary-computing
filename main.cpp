@@ -72,9 +72,16 @@ int main() {
     cout << "Position Y: " << bestVariables[1] << endl;
     cout << "===================================\n" << endl;
 
-    // ===== CONNECT PLOTTER ===== //
-    cout << "Generating graph with Python" << endl;
+    // ===== CONNECT PLOTTERS ===== //
+    cout << "Generating convergence graph with Python" << endl;
     std::system("python3 plotter.py");
+
+    cout << "Generating surface plot with Python" << endl;
+    std::string command = "python3 surface_plotter.py " +
+                          std::to_string(bestVariables[0]) + " " +
+                          std::to_string(bestVariables[1]) + " " +
+                          std::to_string(ga.getBestObjective());
+    std::system(command.c_str());
 
     cout << "\nEnd of program." << endl;
     return 0;
