@@ -141,27 +141,32 @@ void GeneticAlgorithm::printPopulation() {
 
 // ===================== EVALUATION ===================== //
 void GeneticAlgorithm::evaluatePopulation() {
-    bestIndex = 0;
-    worstIndex = 0;
-    sumObjective = 0.0f;
+    OptimizationType type = problem->getConfiguration().type;
 
+    sumObjective = 0.0f;
     for (unsigned int i = 0; i < populationSize; i++) {
         population[i].objectiveValue = problem->evaluate(
             population[i].intValues,
             population[i].realValues,
             numberOfGenes
         );
-
-        if (population[i].objectiveValue > population[bestIndex].objectiveValue)
-            bestIndex = i;
-
-        if (population[i].objectiveValue < population[worstIndex].objectiveValue)
-            worstIndex = i;
-
         sumObjective += population[i].objectiveValue;
     }
 
     avgObjective = sumObjective / populationSize;
+
+    bestIndex = 0;
+    worstIndex = 0;
+
+    for (unsigned int i = 0; i < populationSize; i++) {
+        if (type == MAXIMIZE) {
+            if (population[i].objectiveValue > population[bestIndex].objectiveValue) bestIndex = i;
+            if (population[i].objectiveValue < population[worstIndex].objectiveValue) worstIndex = i;
+        } else {
+            if (population[i].objectiveValue < population[bestIndex].objectiveValue) bestIndex = i;
+            if (population[i].objectiveValue > population[worstIndex].objectiveValue) worstIndex = i;
+        }
+    }
 }
 
 // ===================== FITNESS ===================== //
@@ -186,16 +191,40 @@ void GeneticAlgorithm::computeFitness() {
 
             float minFit = population[worstIndex].fitnessValue;
             float maxFit = population[bestIndex].fitnessValue;
-            float range = maxFit - minFit;
+            float fitRange = maxFit - minFit;
 
-            if (range == 0.0f) {
+            if (fitRange != 0.0f) {
+                sumFitness = 0.0f;
                 for (unsigned int i = 0; i < populationSize; i++) {
-                    population[i].fitnessValue = 1.0f;
+                    population[i].fitnessValue = 100.0f * ((population[i].fitnessValue - minFit) / fitRange);
                     sumFitness += population[i].fitnessValue;
                 }
-            } else {
+            }
+        }
+    }
+    else if (type == MINIMIZE) {
+        float minObj = population[bestIndex].objectiveValue;
+        float maxObj = population[worstIndex].objectiveValue;
+        float range = maxObj - minObj;
+
+        if (range == 0.0f) {
+            for (unsigned int i = 0; i < populationSize; i++) {
+                population[i].fitnessValue = 1.0f;
+                sumFitness += population[i].fitnessValue;
+            }
+        } else {
+            for (unsigned int i = 0; i < populationSize; i++) {
+                population[i].fitnessValue = population[worstIndex].objectiveValue - population[i].objectiveValue;
+            }
+
+            float minFit = population[worstIndex].fitnessValue;
+            float maxFit = population[bestIndex].fitnessValue;
+            float fitRange = maxFit - minFit;
+
+            if (fitRange != 0.0f) {
+                sumFitness = 0.0f;
                 for (unsigned int i = 0; i < populationSize; i++) {
-                    population[i].fitnessValue = 100.0f * ((population[i].fitnessValue - minFit) / range);
+                    population[i].fitnessValue = 100.0f * ((population[i].fitnessValue - minFit) / fitRange);
                     sumFitness += population[i].fitnessValue;
                 }
             }
