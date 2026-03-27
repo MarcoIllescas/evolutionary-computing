@@ -14,11 +14,6 @@ using namespace std;
 // ===================== TYPE DEFINITIONS ===================== //
 typedef unsigned char BYTE;
 
-enum OptimizationType {
-    MAXIMIZE,
-    MINIMIZE
-};
-
 // ===================== INDIVIDUAL STRUCT ===================== //
 struct Individual {
     BYTE* chromosome;
@@ -50,8 +45,9 @@ private:
     const unsigned int* bitsPerGene;
     unsigned int populationSize;
 
-    const float* upperLimits;
-    const float* lowerLimits;
+    unsigned int bitsPerDimension;
+    float upperLimit;
+    float lowerLimit;
 
     // Statistics
     unsigned int bestIndex;
@@ -72,10 +68,6 @@ public:
     // Constructor
     GeneticAlgorithm(
         unsigned int populationSize,
-        unsigned int numberOfGenes,
-        const unsigned int* bitsPerGene,
-        const float* upperLimits,
-        const float* lowerLimits,
         const IOptimizationProblem* problem
     );
 
@@ -85,7 +77,7 @@ public:
 
     // Evaluation
     void evaluatePopulation();
-    void computeFitness(OptimizationType type);
+    void computeFitness();
 
     // Selection
     void selectionRoulette();

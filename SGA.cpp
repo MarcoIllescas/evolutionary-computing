@@ -7,34 +7,19 @@
 // ===================== CONSTRUCTOR ===================== //
 GeneticAlgorithm::GeneticAlgorithm(
     unsigned int populationSize,
-    unsigned int numberOfGenes,
-    const unsigned int* bitsPerGene,
-    const float* upperLimits,
-    const float* lowerLimits,
     const IOptimizationProblem* problem
 )
     : populationSize(populationSize),
-      numberOfGenes(numberOfGenes),
-      bitsPerGene(bitsPerGene),
-      upperLimits(upperLimits),
-      lowerLimits(lowerLimits),
       problem(problem),
-      chromosomeSize(0),
-      bestIndex(0),
-      worstIndex(0),
-      sumObjective(0.0f),
-      avgObjective(0.0f),
-      sumFitness(0.0f),
-      avgFitness(0.0f),
       randomGenerator(std::random_device{}())
 {
-    this->populationSize = populationSize;
-    this->numberOfGenes = numberOfGenes;
-    this->bitsPerGene = bitsPerGene;
-    this->upperLimits = upperLimits;
-    this->lowerLimits = lowerLimits;
+    ProblemConfiguration configuration = problem->getConfiguration();
+    this->numberOfGenes = configuration.dimensions;
+    this->bitsPerDimension = configuration.bitsPerDimension;
+    this->upperLimit = configuration.upperLimit;
+    this->lowerLimit = configuration.lowerLimit;
 
-    chromosomeSize = 0;
+    chromosomeSize = numberOfGenes * bitsPerDimension;
 
     // Compute chromosome size
     for (unsigned int i = 0; i < numberOfGenes; i++)
@@ -83,10 +68,10 @@ GeneticAlgorithm::GeneticAlgorithm(
 void GeneticAlgorithm::decodeToReal() {
     for (unsigned int i = 0; i < populationSize; i++) {
         for (unsigned int g = 0; g < numberOfGenes; g++) {
-            float range = upperLimits[g] - lowerLimits[g];
-            float denominator = std::pow(2, bitsPerGene[g]) - 1;
+            float range = upperLimit - lowerLimit;
+            float denominator = std::pow(2, bitsPerDimension) - 1;
 
-            population[i].realValues[g] = ((population[i].intValues[g] / denominator) * range) + lowerLimits[g];
+            population[i].realValues[g] = ((population[i].intValues[g] / denominator) * range) + lowerLimit;
         }
     }
 }
@@ -94,14 +79,12 @@ void GeneticAlgorithm::decodeToReal() {
 // ===================== DECODE INTEGER ===================== //
 void GeneticAlgorithm::decodeToInteger() {
     for (unsigned int i = 0; i < populationSize; i++) {
-
         unsigned int indexBit = 0;
 
         for (unsigned int g = 0; g < numberOfGenes; g++) {
-
             unsigned int value = 0;
 
-            for (unsigned int b = 0; b < bitsPerGene[g]; b++) {
+            for (unsigned int b = 0; b < bitsPerDimension; b++) {
                 value += population[i].chromosome[indexBit] << b;
                 indexBit++;
             }
@@ -121,7 +104,7 @@ void GeneticAlgorithm::printIndividual(unsigned int index) {
     for (int i = chromosomeSize - 1; i >= 0; i--) {
         if (i == (int)accumulated) {
             cout << ": ";
-            accumulated -= bitsPerGene[g];
+            accumulated -= bitsPerDimension;
             g--;
         }
         cout << (int)population[index].chromosome[i];
@@ -180,7 +163,8 @@ void GeneticAlgorithm::evaluatePopulation() {
 }
 
 // ===================== FITNESS ===================== //
-void GeneticAlgorithm::computeFitness(OptimizationType type) {
+void GeneticAlgorithm::computeFitness() {
+    OptimizationType type = problem->getConfiguration().type;
     sumFitness = 0.0f;
 
     if (type == MAXIMIZE) {

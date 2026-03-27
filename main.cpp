@@ -12,40 +12,19 @@
 using namespace std;
 
 // ===================== GA CONFIGURATION ===================== //
-const unsigned int NUMBER_OF_GENES = 1;
-const unsigned int BITS_PER_GENE[NUMBER_OF_GENES] = {8};
-
-const unsigned int POPULATION_SIZE = 10;
-const unsigned int MAX_GENERATIONS = 100;
-
-const unsigned int PRINT_FREQUENCY = 10;
-
-const float UPPER_LIMITS[NUMBER_OF_GENES] = {255};
-const float LOWER_LIMITS[NUMBER_OF_GENES] = {0};
+const unsigned int POPULATION_SIZE = 50;
+const unsigned int MAX_GENERATIONS = 1000;
+const unsigned int PRINT_FREQUENCY = 100;
 
 // ===================== MAIN ===================== //
 int main() {
     cout << "Starting Genetic Algorithm..." << endl;
 
-    MaximizeParabola currentProblem;
+    // 1. Select problem
+    SphereFunction currentProblem;
 
-    GeneticAlgorithm ga(
-        POPULATION_SIZE,
-        NUMBER_OF_GENES,
-        BITS_PER_GENE,
-        UPPER_LIMITS,
-        LOWER_LIMITS,
-        &currentProblem
-    );
-
-    // ===== INITIAL EVALUATION ===== //
-    ga.decodeToInteger();
-    ga.decodeToReal();
-    ga.evaluatePopulation();
-    ga.computeFitness(MAXIMIZE);
-
-    cout << "Initial Population:" << endl;
-    ga.printPopulation();
+    // 2. Motor initialization
+    GeneticAlgorithm ga(POPULATION_SIZE, &currentProblem);
 
     // ===== OPEN CSV FILE AND WRITE HEADERS ===== //
     std::ofstream csvFile("ga_results.csv");
@@ -56,24 +35,24 @@ int main() {
 
         ga.selectionRoulette();
         ga.crossoverOnePoint(0.88);
-        ga.mutation(0.03);
+        ga.mutation(0.01);
 
         ga.applyElitism();
-
         ga.nextGeneration();
 
         // Re-evaluate
         ga.decodeToInteger();
         ga.decodeToReal();
         ga.evaluatePopulation();
-        ga.computeFitness(MAXIMIZE);
+        ga.computeFitness();
 
         // Write data
         csvFile << generation << "," << ga.getBestObjective() << "," << ga.getAvgObjective() << "," << ga.getWorstObjective() << "\n";
 
         if (generation == 1 || generation % PRINT_FREQUENCY == 0 || generation == MAX_GENERATIONS) {
             cout << "\nGeneration " << generation << ":" << endl;
-            ga.printPopulation();
+            // ga.printPopulation();
+            cout << " Best Objective Value: " << ga.getBestObjective() << endl;
         }
     }
 
