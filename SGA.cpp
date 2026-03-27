@@ -21,6 +21,14 @@ GeneticAlgorithm::GeneticAlgorithm(
 
     chromosomeSize = numberOfGenes * bitsPerDimension;
 
+    // Safe initialization
+    bestIndex = 0;
+    worstIndex = 0;
+    sumObjective = 0.0f;
+    avgObjective = 0.0f;
+    sumFitness = 0.0f;
+    avgFitness = 0.0f;
+
     // Allocate memory
     population = new Individual[populationSize];
     newPopulation = new Individual[populationSize];

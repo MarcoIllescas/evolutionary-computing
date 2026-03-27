@@ -26,13 +26,18 @@ int main() {
     // 2. Motor initialization
     GeneticAlgorithm ga(POPULATION_SIZE, &currentProblem);
 
+    // ===== INITIAL EVALUATION ===== //
+    ga.decodeToInteger();
+    ga.decodeToReal();
+    ga.evaluatePopulation();
+    ga.computeFitness();
+
     // ===== OPEN CSV FILE AND WRITE HEADERS ===== //
     std::ofstream csvFile("ga_results.csv");
     csvFile << "Generation,Best,Average,Worst\n";
 
     // ===== EVOLUTION LOOP ===== //
     for (unsigned int generation = 1; generation <= MAX_GENERATIONS; generation++) {
-
         ga.selectionRoulette();
         ga.crossoverOnePoint(0.88);
         ga.mutation(0.01);
