@@ -21,12 +21,6 @@ GeneticAlgorithm::GeneticAlgorithm(
 
     chromosomeSize = numberOfGenes * bitsPerDimension;
 
-    // Compute chromosome size
-    for (unsigned int i = 0; i < numberOfGenes; i++)
-    {
-        chromosomeSize += bitsPerGene[i];
-    }
-
     // Allocate memory
     population = new Individual[populationSize];
     newPopulation = new Individual[populationSize];

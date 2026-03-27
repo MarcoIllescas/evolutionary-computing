@@ -42,7 +42,6 @@ private:
     // Configuration
     unsigned int chromosomeSize;
     unsigned int numberOfGenes;
-    const unsigned int* bitsPerGene;
     unsigned int populationSize;
 
     unsigned int bitsPerDimension;
