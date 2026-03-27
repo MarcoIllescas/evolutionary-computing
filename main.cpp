@@ -21,7 +21,7 @@ int main() {
     cout << "Starting Genetic Algorithm..." << endl;
 
     // 1. Select problem
-    SphereFunction currentProblem;
+    PracticeFunction currentProblem;
 
     // 2. Motor initialization
     GeneticAlgorithm ga(POPULATION_SIZE, &currentProblem);
@@ -64,6 +64,13 @@ int main() {
     // ===== CLOSE CSV FILE ===== //
     csvFile.close();
     cout << "\nData saved in ga_results.csv" << endl;
+
+    const float* bestVariables = ga.getBestVariables();
+    cout << "\n=== FINAL RESULTS ===" << endl;
+    cout << "Maximum value (Z): " << ga.getBestObjective() << endl;
+    cout << "Position X: " << bestVariables[0] << endl;
+    cout << "Position Y: " << bestVariables[1] << endl;
+    cout << "===================================\n" << endl;
 
     // ===== CONNECT PLOTTER ===== //
     cout << "Generating graph with Python" << endl;

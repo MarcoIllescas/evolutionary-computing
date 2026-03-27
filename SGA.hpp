@@ -99,4 +99,5 @@ public:
     float getBestObjective() const { return population[bestIndex].objectiveValue; }
     float getWorstObjective() const { return population[worstIndex].objectiveValue; }
     float getAvgObjective() const { return avgObjective; }
+    const float* getBestVariables() const { return population[bestIndex].realValues; }
 };
