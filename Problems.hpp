@@ -4,7 +4,6 @@
 #include "IOptimizationProblem.hpp"
 #include <cmath>
 
-// Sphere Function
 class SphereFunction : public IOptimizationProblem {
 public:
     ProblemConfiguration getConfiguration() const override {
@@ -24,6 +23,88 @@ public:
             sum += std::pow(realValues[i], 2);
         }
         return sum;
+    }
+};
+
+class RosenbrockFunction : public IOptimizationProblem {
+public:
+    ProblemConfiguration getConfiguration() const override {
+        return {
+            30,
+            16,
+            -30.0f,
+            30.0f,
+            MINIMIZE
+        };
+    }
+
+    float evaluate(const unsigned int* intValues, const float* realValues, unsigned int numGenes) const override {
+        float sum = 0.0f;
+
+        for (unsigned int i = 0; i < numGenes-1; i++) {
+            float xi = realValues[i];
+            float xip = realValues[i+1];
+
+            float term1 = 100.0f * std::pow(xip - xi*xi, 2);
+            float term2 = std::pow(xi - 1.0f, 2);
+
+            sum += term1 + term2;
+        }
+
+        return sum;
+    }
+};
+
+class RastriginFunction : public IOptimizationProblem {
+public:
+    ProblemConfiguration getConfiguration() const override {
+        return {
+            30,
+            16,
+            -5.12f,
+            5.12f,
+            MINIMIZE
+        };
+    }
+
+    float evaluate(const unsigned int* intValues, const float* realValues, unsigned int numGenes) const override {
+        const float PI = 3.14159265358979323846f;
+
+        float sum = 0.0f;
+
+        for (unsigned int i = 0; i < numGenes; i++) {
+            float x = realValues[i];
+
+            sum += (x * x) - 10.0f * std::cos(2.0f * PI * x) + 10.0f;
+        }
+
+        return sum;
+    }
+};
+
+class GriewankFunction : public IOptimizationProblem {
+public:
+    ProblemConfiguration getConfiguration() const override {
+        return {
+            30,
+            16,
+            -600.0f,
+            600.0f,
+            MINIMIZE
+        };
+    }
+
+    float evaluate(const unsigned int* intValues, const float* realValues, unsigned int numGenes) const override {
+        float sumPart = 0.0f;
+        float prodPart = 1.0f;
+
+        for (unsigned int i = 0; i < numGenes; i++) {
+            float x = realValues[i];
+            sumPart += (x * x) / 4000.0f;
+            prodPart *= std::cos(x / std::sqrt(float(i + 1)));
+        }
+
+        return sumPart - prodPart + 1.0f;
     }
 };
 
