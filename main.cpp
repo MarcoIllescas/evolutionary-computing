@@ -1,88 +1,216 @@
 /*
     MAIN PROGRAM
-    Usage of the Simple Genetic Algorithm
+    Simple Genetic Algorithm - 100 Independent Runs Experiment
 */
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <vector>
+#include <numeric>
+#include <cmath>
+#include <algorithm>
 
 #include "SGA.hpp"
 #include "Problems.hpp"
 
 using namespace std;
 
-// ===================== GA CONFIGURATION ===================== //
-const unsigned int POPULATION_SIZE = 50;
+// ===================== GA PARAMETERS ===================== //
+const unsigned int POPULATION_SIZE = 100;
 const unsigned int MAX_GENERATIONS = 1000;
 const unsigned int PRINT_FREQUENCY = 100;
 
+const double CROSSOVER_PROB = 0.88;
+const double MUTATION_PROB  = 0.002;
+
+const unsigned int NUM_RUNS = 100;
+
 // ===================== MAIN ===================== //
 int main() {
-    cout << "Starting Genetic Algorithm..." << endl;
 
-    // 1. Select problem
-    PracticeFunction currentProblem;
+    cout << "Starting 100-run Genetic Algorithm Experiment..." << endl;
 
-    // 2. Motor initialization
-    GeneticAlgorithm ga(POPULATION_SIZE, &currentProblem);
+    // Select optimization problem
+    GriewankFunction currentProblem;
 
-    // ===== INITIAL EVALUATION ===== //
-    ga.decodeToInteger();
-    ga.decodeToReal();
-    ga.evaluatePopulation();
-    ga.computeFitness();
+    ProblemConfiguration conf = currentProblem.getConfiguration();
+    unsigned int dims = conf.dimensions;
 
-    // ===== OPEN CSV FILE AND WRITE HEADERS ===== //
-    std::ofstream csvFile("ga_results.csv");
-    csvFile << "Generation,Best,Average,Worst\n";
+    // Store best result from each independent run
+    vector<float> bestResults;
 
-    // ===== EVOLUTION LOOP ===== //
-    for (unsigned int generation = 1; generation <= MAX_GENERATIONS; generation++) {
-        ga.selectionRoulette();
-        ga.crossoverOnePoint(0.88);
-        ga.mutation(0.01);
+    // File for experiment statistics
+    ofstream experimentFile("experiment_results.csv");
+    experimentFile << "Run,BestObjective\n";
 
-        ga.applyElitism();
-        ga.nextGeneration();
+    // File for convergence tracking (only first run)
+    ofstream convergenceFile("ga_results.csv");
+    convergenceFile << "Generation,Best,Average,Worst\n";
 
-        // Re-evaluate
+
+    // =====================================================
+    // OUTER LOOP: 100 Independent Executions
+    // =====================================================
+    for(unsigned int run = 1; run <= NUM_RUNS; run++) {
+
+        cout << "\nStarting Run " << run << endl;
+
+        // Initialize GA from scratch for this run
+        GeneticAlgorithm ga(POPULATION_SIZE, &currentProblem);
+
+        // Initial evaluation
         ga.decodeToInteger();
         ga.decodeToReal();
         ga.evaluatePopulation();
         ga.computeFitness();
 
-        // Write data
-        csvFile << generation << "," << ga.getBestObjective() << "," << ga.getAvgObjective() << "," << ga.getWorstObjective() << "\n";
 
-        if (generation == 1 || generation % PRINT_FREQUENCY == 0 || generation == MAX_GENERATIONS) {
-            cout << "\nGeneration " << generation << ":" << endl;
-            // ga.printPopulation();
-            cout << " Best Objective Value: " << ga.getBestObjective() << endl;
+        // =================================================
+        // INNER LOOP: Evolution over generations
+        // =================================================
+        for(unsigned int generation = 1;
+            generation <= MAX_GENERATIONS;
+            generation++) {
+
+            // Genetic operators
+            ga.selectionRoulette();
+            ga.crossoverOnePoint(CROSSOVER_PROB);
+            ga.mutation(MUTATION_PROB);
+
+            ga.applyElitism();
+            ga.nextGeneration();
+
+            // Re-evaluate new generation
+            ga.decodeToInteger();
+            ga.decodeToReal();
+            ga.evaluatePopulation();
+            ga.computeFitness();
+
+            // Save convergence only for first run
+            if(run == 1) {
+                convergenceFile << generation << "," << ga.getBestObjective() << "," << ga.getAvgObjective() << "," << ga.getWorstObjective() << "\n";
+
+                if(generation == 1 || generation % PRINT_FREQUENCY == 0 || generation == MAX_GENERATIONS) {
+                    cout << "Generation " << generation << " | Best: " << ga.getBestObjective() << endl;
+                }
+            }
+
+        } // End generations loop
+
+
+        // Save best solution from this run
+        float runBest = ga.getBestObjective();
+
+        bestResults.push_back(runBest);
+
+        experimentFile
+            << run
+            << ","
+            << runBest
+            << "\n";
+
+
+        if(run % 10 == 0 || run == 1) {
+
+            cout << "Run "
+                 << run
+                 << " completed. Best value = "
+                 << runBest
+                 << endl;
         }
+
+    } // End 100-run loop
+
+
+    convergenceFile.close();
+    experimentFile.close();
+
+
+    // =====================================================
+    // STATISTICAL ANALYSIS
+    // =====================================================
+
+    float sum = accumulate(
+        bestResults.begin(),
+        bestResults.end(),
+        0.0f
+    );
+
+    float mean = sum / NUM_RUNS;
+
+
+    float variance = 0.0f;
+
+    for(float val : bestResults) {
+
+        variance += pow(val - mean, 2);
     }
 
-    // ===== CLOSE CSV FILE ===== //
-    csvFile.close();
-    cout << "\nData saved in ga_results.csv" << endl;
+    variance /= NUM_RUNS;
 
-    const float* bestVariables = ga.getBestVariables();
-    cout << "\n=== FINAL RESULTS ===" << endl;
-    cout << "Maximum value (Z): " << ga.getBestObjective() << endl;
-    cout << "Position X: " << bestVariables[0] << endl;
-    cout << "Position Y: " << bestVariables[1] << endl;
-    cout << "===================================\n" << endl;
+    float std_dev = sqrt(variance);
 
-    // ===== CONNECT PLOTTERS ===== //
-    cout << "Generating convergence graph with Python" << endl;
-    std::system("python3 plotter.py");
 
-    cout << "Generating surface plot with Python" << endl;
-    std::string command = "python3 surface_plotter.py " +
-                          std::to_string(bestVariables[0]) + " " +
-                          std::to_string(bestVariables[1]) + " " +
-                          std::to_string(ga.getBestObjective());
-    std::system(command.c_str());
+    float overallBest =
+        *min_element(
+            bestResults.begin(),
+            bestResults.end()
+        );
+
+
+    // =====================================================
+    // FINAL RESULTS
+    // =====================================================
+
+    cout << "\n===================================" << endl;
+    cout << "EXPERIMENT RESULTS (100 RUNS)" << endl;
+
+    cout << "Problem Dimensions: "
+         << dims
+         << endl;
+
+    cout << "Mean Best Objective: "
+         << mean
+         << endl;
+
+    cout << "Standard Deviation: "
+         << std_dev
+         << endl;
+
+    cout << "Overall Best Found: "
+         << overallBest
+         << endl;
+
+    cout << "===================================\n"
+         << endl;
+
+
+    // =====================================================
+    // PYTHON PLOTTERS
+    // =====================================================
+
+    cout << "Generating convergence plot..." << endl;
+    system("python3 plotter.py");
+
+
+    if(dims == 2) {
+
+        cout << "Generating surface plot..." << endl;
+
+        // Use dummy values or adapt if you want best variables tracked
+        system("python3 surface_plotter.py 0 0 0");
+    }
+    else {
+
+        cout
+        << "Surface plot skipped "
+        << "(requires 2 dimensions)."
+        << endl;
+    }
+
 
     cout << "\nEnd of program." << endl;
+
     return 0;
 }
