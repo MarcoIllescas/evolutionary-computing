@@ -248,7 +248,25 @@ void GeneticAlgorithm::selectionRoulette() {
     }
 }
 
-// ===================== CROSSOVER ===================== //
+// ===================== TOURNAMENT ==================== //
+void GeneticAlgorithm::selectionTournament(unsigned int tournamentSize) {
+    std::uniform_int_distribution<unsigned int> distIndex(0, populationSize - 1);
+
+    for (unsigned int i = 0; i < populationSize; i++) {
+        unsigned int bestContestant = distIndex(randomGenerator);
+
+        for (unsigned int j = 0; j < tournamentSize; j++) {
+            unsigned int contestant = distIndex(randomGenerator);
+
+            if (population[contestant].fitnessValue > population[bestContestant].fitnessValue) {
+                bestContestant = contestant;
+            }
+        }
+        selectionIndices[i] = bestContestant;
+    }
+}
+
+// ===================== ONE-POINT CROSSOVER ===================== //
 void GeneticAlgorithm::crossoverOnePoint(double probCrossover) {
     unsigned int limit = chromosomeSize - 1;
 
@@ -267,6 +285,38 @@ void GeneticAlgorithm::crossoverOnePoint(double probCrossover) {
 
         for (unsigned int j = 0; j < chromosomeSize; j++) {
             if (r < probCrossover && j > crossoverPoint) {
+                newPopulation[i].chromosome[j] = population[parent2].chromosome[j];
+                newPopulation[i + 1].chromosome[j] = population[parent1].chromosome[j];
+            } else {
+                newPopulation[i].chromosome[j] = population[parent1].chromosome[j];
+                newPopulation[i + 1].chromosome[j] = population[parent2].chromosome[j];
+            }
+        }
+    }
+}
+
+// ===================== TWO-POINT CROSSOVER ===================== //
+void GeneticAlgorithm::crossoverTwoPoint(double probCrossover) {
+    unsigned int limit = chromosomeSize - 1;
+
+    std::uniform_real_distribution<double> distProb(0.0, 1.0);
+    std::uniform_int_distribution<unsigned int> distPoint(0, limit > 0 ? limit - 1 : 0);
+
+    for (unsigned int i = 0; i < populationSize; i += 2) {
+        double r = distProb(randomGenerator);
+
+        unsigned int parent1 = selectionIndices[i];
+        unsigned int parent2 = selectionIndices[i + 1];
+
+        unsigned int point1 = distPoint(randomGenerator);
+        unsigned int point2 = distPoint(randomGenerator);
+
+        if (point1 > point2) {
+            std::swap(point1, point2);
+        }
+
+        for (unsigned int j = 0; j < chromosomeSize; j++) {
+            if (r < probCrossover && j > point1 && j <= point2) {
                 newPopulation[i].chromosome[j] = population[parent2].chromosome[j];
                 newPopulation[i + 1].chromosome[j] = population[parent1].chromosome[j];
             } else {

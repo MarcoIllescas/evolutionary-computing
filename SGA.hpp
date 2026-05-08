@@ -80,9 +80,11 @@ public:
 
     // Selection
     void selectionRoulette();
+    void selectionTournament(unsigned int tournamentSize);
 
     // Genetic operators
     void crossoverOnePoint(double probabilityCrossover);
+    void crossoverTwoPoint(double probabilityCrossover);
     void mutation(double probabilityMutation);
 
     // Elitism
