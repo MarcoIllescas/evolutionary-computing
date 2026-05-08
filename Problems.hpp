@@ -134,4 +134,44 @@ public:
     }
 };
 
+class PT03Function : public IOptimizationProblem {
+public:
+    ProblemConfiguration getConfiguration() const override {
+        return {
+            10,
+            16,
+            -20.0f,
+            20.0f,
+            MAXIMIZE
+        };
+    }
+
+    float evaluate(const unsigned int* intValues, const float* realValues, unsigned int numGenes) const override {
+        float x1 = realValues[0];
+        float x2 = realValues[1];
+        float x3 = realValues[2];
+        float x4 = realValues[3];
+        float x5 = realValues[4];
+        float x6 = realValues[5];
+        float x7 = realValues[6];
+        float x8 = realValues[7];
+        float x9 = realValues[8];
+        float x10 = realValues[9];
+
+        float result = 1000.0f
+            - std::pow(x1 + 7.5f, 2)
+            - std::pow(x2 + 3.0f, 2)
+            - std::pow(x3 - 3.0f, 2)
+            - std::pow(x4 - 5.0f, 2)
+            - std::pow(x5 + 2.5f, 2)
+            - std::pow(x6 - 10.0f, 2)
+            - std::pow(x7 - 15.0f, 2)
+            - std::pow(x8 + 10.0f, 2)
+            - std::pow(x9 + 15.0f, 2)
+            - std::pow(x10 - 0.5f, 2);
+
+        return result;
+    }
+};
+
 #endif
