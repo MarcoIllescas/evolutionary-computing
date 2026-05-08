@@ -203,31 +203,11 @@ void GeneticAlgorithm::computeFitness() {
         }
     }
     else if (type == MINIMIZE) {
-        float minObj = population[bestIndex].objectiveValue;
-        float maxObj = population[worstIndex].objectiveValue;
-        float range = maxObj - minObj;
+        sumFitness = 0.0f;
 
-        if (range == 0.0f) {
-            for (unsigned int i = 0; i < populationSize; i++) {
-                population[i].fitnessValue = 1.0f;
-                sumFitness += population[i].fitnessValue;
-            }
-        } else {
-            for (unsigned int i = 0; i < populationSize; i++) {
-                population[i].fitnessValue = population[worstIndex].objectiveValue - population[i].objectiveValue;
-            }
-
-            float minFit = population[worstIndex].fitnessValue;
-            float maxFit = population[bestIndex].fitnessValue;
-            float fitRange = maxFit - minFit;
-
-            if (fitRange != 0.0f) {
-                sumFitness = 0.0f;
-                for (unsigned int i = 0; i < populationSize; i++) {
-                    population[i].fitnessValue = 100.0f * ((population[i].fitnessValue - minFit) / fitRange);
-                    sumFitness += population[i].fitnessValue;
-                }
-            }
+        for (unsigned int i = 0; i < populationSize; i++) {
+            population[i].fitnessValue = 1.0f / (1.0f + std::abs(population[i].objectiveValue));
+            sumFitness += population[i].fitnessValue;
         }
     }
 
