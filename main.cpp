@@ -10,6 +10,7 @@
 #include <numeric>
 #include <cmath>
 #include <algorithm>
+#include <string>
 
 #include "SGA.hpp"
 #include "Problems.hpp"
@@ -26,13 +27,20 @@ const double MUTATION_PROB  = 0.002;
 
 const unsigned int NUM_RUNS = 100;
 
+// ============= EXPERIMENT CONFIGURATION ============ //
+const int SELECTION_METHOD = 0; // 0 = Roulette, 1 = Tournament
+const unsigned int TOURNAMENT_SIZE = 3;
+
+const int CROSSOVER_METHOD = 1; // 1 = One-Point, 2 = Two-Point
+const bool GENERATE_BOXPLOT = true;
+
 // ===================== MAIN ===================== //
 int main() {
 
     cout << "Starting 100-run Genetic Algorithm Experiment..." << endl;
 
     // Select optimization problem
-    GriewankFunction currentProblem;
+    PT03Function currentProblem;
 
     ProblemConfiguration conf = currentProblem.getConfiguration();
     unsigned int dims = conf.dimensions;
@@ -41,7 +49,8 @@ int main() {
     vector<float> bestResults;
 
     // File for experiment statistics
-    ofstream experimentFile("experiment_results.csv");
+    string experimentFileName = (SELECTION_METHOD == 0 ? "experiment_results_roulette.csv" : "experiment_results_torneum.csv");
+    ofstream experimentFile(experimentFileName);
     experimentFile << "Run,BestObjective\n";
 
     // File for convergence tracking (only first run)
@@ -74,8 +83,18 @@ int main() {
             generation++) {
 
             // Genetic operators
-            ga.selectionRoulette();
-            ga.crossoverOnePoint(CROSSOVER_PROB);
+            if (SELECTION_METHOD == 0) {
+                ga.selectionRoulette();
+            } else {
+                ga.selectionTournament(TOURNAMENT_SIZE);
+            }
+
+            if (CROSSOVER_METHOD == 1) {
+                ga.crossoverOnePoint(CROSSOVER_PROB);
+            } else {
+                ga.crossoverTwoPoint(CROSSOVER_PROB);
+            }
+
             ga.mutation(MUTATION_PROB);
 
             ga.applyElitism();
@@ -189,26 +208,25 @@ int main() {
     // =====================================================
     // PYTHON PLOTTERS
     // =====================================================
-
     cout << "Generating convergence plot..." << endl;
     system("python3 plotter.py");
 
-
     if(dims == 2) {
-
         cout << "Generating surface plot..." << endl;
 
         // Use dummy values or adapt if you want best variables tracked
         system("python3 surface_plotter.py 0 0 0");
-    }
-    else {
-
+    } else {
         cout
         << "Surface plot skipped "
         << "(requires 2 dimensions)."
         << endl;
     }
 
+    if (GENERATE_BOXPLOT) {
+        cout << "Generating box plot..." << endl;
+        system("python3 boxplotter.py");
+    }
 
     cout << "\nEnd of program." << endl;
 
