@@ -2,37 +2,44 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+from fontTools.diff import color
+
+file_roulette = "experiment_results_roulette.csv"
+file_tournament = "experiment_results_tournament.csv"
+
 data = []
 labels = []
 
-# 1. Roulette data
-if os.path.exists('experiment_results_roulette.csv'):
-    df_roulette = pd.read_csv('experiment_results_roulette.csv')
+if os.path.exists(file_roulette) and os.path.exists(file_tournament):
+    df_roulette = pd.read_csv(file_roulette)
     data.append(df_roulette['BestObjective'])
-    labels.append('Roulette')
+    labels.append("Roulette")
 
-# 2. Tourneum data
-if os.path.exists('experiment_results_tournament.csv'):
-    df_tournament = pd.read_csv('experiment_results_tournament.csv')
+    df_tournament = pd.read_csv(file_tournament)
     data.append(df_tournament['BestObjective'])
-    labels.append('Tournament')
+    labels.append("Tournament")
 
-# 3. Generate the plot if there is data
-if data:
     plt.figure(figsize = (8,6))
 
-    box = plt.boxplot(data, patch_artist = True, labels = labels,
+    box = plt.boxplot(data, patch_artist = True, tick_labels = labels,
                       boxprops = dict(facecolor = 'lightblue', color = 'blue'),
                       medianprops = dict(color = 'red', linewidth = 2),
                       flierprops = dict(marker = 'o', color = 'red', alpha = 0.5))
 
-    plt.title('Comparison of Selection Methods (100 runs)', fontsize = 15)
-    plt.ylabel('Objective Function Value', fontsize = 12)
+    plt.title("Selection Method Comparison (100 runs)", fontsize = 15)
+    plt.ylabel("Objective Function Value (Maximized)", fontsize = 12)
     plt.grid(True, linestyle = '--', alpha = 0.7)
     plt.tight_layout()
 
-    # Save image
     plt.savefig('boxplot_comparison.png', dpi = 300)
-    print("boxplot_comparison.png saved")
+    print("Boxplot comparison plot saved at 'boxplot_comparison.png'")
+
 else:
-    print("Error: No results file found")
+    print("=======================================================================")
+    print("Warning Boxplot: To generate the plot it is necessary to have both .csv")
+    if not os.path.exists(file_roulette):
+        print(" -> Roulette results missing.")
+    if not os.path.exists(file_tournament):
+        print(" -> Tournament results missing.")
+    print("Plot will generate when both csv files are present.")
+    print("=======================================================================")
