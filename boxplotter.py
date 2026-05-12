@@ -2,8 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-from fontTools.diff import color
-
 file_roulette = "experiment_results_roulette.csv"
 file_tournament = "experiment_results_tournament.csv"
 
