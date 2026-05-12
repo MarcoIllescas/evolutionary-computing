@@ -170,13 +170,14 @@ int main() {
 
     float std_dev = sqrt(variance);
 
+    OptimizationType type = currentProblem.getConfiguration().type;
+    float overallBest;
 
-    float overallBest =
-        *min_element(
-            bestResults.begin(),
-            bestResults.end()
-        );
-
+    if (type == MAXIMIZE) {
+        overallBest = *max_element(bestResults.begin(), bestResults.end());
+    } else {
+        overallBest = *min_element(bestResults.begin(), bestResults.end());
+    }
 
     // =====================================================
     // FINAL RESULTS
