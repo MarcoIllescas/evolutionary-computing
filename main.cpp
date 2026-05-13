@@ -22,16 +22,16 @@ const unsigned int POPULATION_SIZE = 100;
 const unsigned int MAX_GENERATIONS = 1000;
 const unsigned int PRINT_FREQUENCY = 100;
 
-const double CROSSOVER_PROB = 0.88;
-const double MUTATION_PROB  = 0.002;
+const double CROSSOVER_PROB = 0.85;
+const double MUTATION_PROB  = 0.01;
 
 const unsigned int NUM_RUNS = 100;
 
 // ============= EXPERIMENT CONFIGURATION ============ //
-const int SELECTION_METHOD = 0; // 0 = Roulette, 1 = Tournament
+const int SELECTION_METHOD = 1; // 0 = Roulette, 1 = Tournament
 const unsigned int TOURNAMENT_SIZE = 3;
 
-const int CROSSOVER_METHOD = 1; // 1 = One-Point, 2 = Two-Point
+const int CROSSOVER_METHOD = 2; // 1 = One-Point, 2 = Two-Point
 const bool GENERATE_BOXPLOT = true;
 
 // ===================== MAIN ===================== //
@@ -49,7 +49,13 @@ int main() {
     vector<float> bestResults;
 
     // File for experiment statistics
-    string experimentFileName = (SELECTION_METHOD == 0 ? "experiment_results_roulette.csv" : "experiment_results_torneum.csv");
+    string experimentFileName;
+    if (SELECTION_METHOD == 0) {
+        experimentFileName = "experiment_results_roulette.csv";
+    } else {
+        experimentFileName = "tournament_results_N" + to_string(TOURNAMENT_SIZE) + ".csv";
+    }
+
     ofstream experimentFile(experimentFileName);
     experimentFile << "Run,BestObjective\n";
 
@@ -225,8 +231,13 @@ int main() {
     }
 
     if (GENERATE_BOXPLOT) {
-        cout << "Generating box plot..." << endl;
-        system("python3 boxplotter.py");
+        if (SELECTION_METHOD == 0) {
+            cout << "Generating box plot..." << endl;
+            system("python3 boxplotter.py");
+        } else {
+            cout << "Generating Tournament Sizes Boxplot..." << endl;
+            system("python3 boxplotter_tournament.py");
+        }
     }
 
     cout << "\nEnd of program." << endl;
