@@ -327,6 +327,37 @@ void GeneticAlgorithm::crossoverTwoPoint(double probCrossover) {
     }
 }
 
+// ====================== UNIFORM CROSSOVER ====================== //
+void GeneticAlgorithm::crossoverUniform(double probCrossover) {
+    std::uniform_real_distribution<double> distProb(0.0, 1.0);
+
+    for (unsigned int i = 0; i < populationSize; i += 2) {
+        double r = distProb(randomGenerator);
+
+        unsigned int parent1 = selectionIndices[i];
+        unsigned int parent2 = selectionIndices[i + 1];
+
+        if (r < probCrossover) {
+            for (unsigned int j = 0; j < chromosomeSize; j++) {
+                double coinFlip = distProb(randomGenerator);
+
+                if (coinFlip < 0.5) {
+                    newPopulation[i].chromosome[j] = population[parent1].chromosome[j];
+                    newPopulation[i + 1].chromosome[j] = population[parent2].chromosome[j];
+                } else {
+                    newPopulation[i].chromosome[j] = population[parent2].chromosome[j];
+                    newPopulation[i + 1].chromosome[j] = population[parent1].chromosome[j];
+                }
+            }
+        } else {
+            for (unsigned int j = 0; j < chromosomeSize; j++) {
+                newPopulation[i].chromosome[j] = population[parent1].chromosome[j];
+                newPopulation[i + 1].chromosome[j] = population[parent2].chromosome[j];
+            }
+        }
+    }
+}
+
 // ===================== MUTATION ===================== //
 void GeneticAlgorithm::mutation(double probMutation) {
     // Random initialization

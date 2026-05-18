@@ -85,6 +85,7 @@ public:
     // Genetic operators
     void crossoverOnePoint(double probabilityCrossover);
     void crossoverTwoPoint(double probabilityCrossover);
+    void crossoverUniform(double probabilityCrossover);
     void mutation(double probabilityMutation);
 
     // Elitism

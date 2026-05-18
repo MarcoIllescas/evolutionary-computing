@@ -31,7 +31,7 @@ const unsigned int NUM_RUNS = 100;
 const int SELECTION_METHOD = 1; // 0 = Roulette, 1 = Tournament
 const unsigned int TOURNAMENT_SIZE = 3;
 
-const int CROSSOVER_METHOD = 2; // 1 = One-Point, 2 = Two-Point
+const int CROSSOVER_METHOD = 3; // 1 = One-Point, 2 = Two-Point, 3 = Uniform
 const bool GENERATE_BOXPLOT = true;
 
 // ===================== MAIN ===================== //
@@ -50,10 +50,12 @@ int main() {
 
     // File for experiment statistics
     string experimentFileName;
-    if (SELECTION_METHOD == 0) {
-        experimentFileName = "experiment_results_roulette.csv";
+    if (SELECTION_METHOD == 1) {
+        experimentFileName = "crossover_results_1pt.csv";
+    } else if (CROSSOVER_METHOD == 2) {
+        experimentFileName = "crossover_results_2pt.csv";
     } else {
-        experimentFileName = "tournament_results_N" + to_string(TOURNAMENT_SIZE) + ".csv";
+        experimentFileName = "crossover_results_uniform.csv";
     }
 
     ofstream experimentFile(experimentFileName);
@@ -97,8 +99,10 @@ int main() {
 
             if (CROSSOVER_METHOD == 1) {
                 ga.crossoverOnePoint(CROSSOVER_PROB);
-            } else {
+            } else if (CROSSOVER_METHOD == 2) {
                 ga.crossoverTwoPoint(CROSSOVER_PROB);
+            } else {
+                ga.crossoverUniform(CROSSOVER_PROB);
             }
 
             ga.mutation(MUTATION_PROB);
@@ -231,13 +235,8 @@ int main() {
     }
 
     if (GENERATE_BOXPLOT) {
-        if (SELECTION_METHOD == 0) {
-            cout << "Generating box plot..." << endl;
-            system("python3 boxplotter.py");
-        } else {
-            cout << "Generating Tournament Sizes Boxplot..." << endl;
-            system("python3 boxplotter_tournament.py");
-        }
+        cout << "Generating Crossover Boxplot..." << endl;
+        system("python3 boxplotter_crossover.py");
     }
 
     cout << "\nEnd of program." << endl;
